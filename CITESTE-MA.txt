@@ -1,0 +1,34 @@
+Distors REAPER
+
+Când masterul din REAPER dă în distors, NVDA face un bip scurt și îți spune cu cât să scazi. Cât asculți, îți spune și cât mai poți urca fiecare pistă fără distors.
+
+Sunt două bucăți care merg împreună:
+Distors REAPER.nvda-addon este addonul pentru NVDA. El face bipul și îți spune mesajul.
+Distors REAPER.lua este scriptul pentru REAPER. El urmărește masterul și pistele.
+
+Instalare, o singură dată
+
+1. Addonul: apasă Enter pe Distors REAPER.nvda-addon, confirmă instalarea și repornește NVDA.
+2. Scriptul: în REAPER, deschide lista de acțiuni din meniul Actions, Show action list. Apasă butonul New action, alege Load ReaScript și selectează Distors REAPER.lua. Scriptul apare în listă cu numele „Script: Distors REAPER.lua”. Îi poți pune o scurtătură din aceeași listă.
+
+Folosire
+
+Pornește scriptul din lista de acțiuni sau cu scurtătura lui. NVDA spune „Detectorul de distors a pornit”. Aceeași scurtătură îl oprește și îl pornește din nou. După ce schimbi ceva în script, apasă scurtătura de două ori.
+Pornire automată: după prima rulare, scriptul se adaugă singur în __startup.lua din REAPER și pornește de fiecare dată când deschizi REAPER.
+
+Distors
+
+Distorsul se aude doar când masterul trece de 0 dB. Vârfurile foarte mici peste 0 dB (sub o jumătate de dB, cum au piesele masterizate sau MP3-urile) nu dau alarmă; pragul e TOLERANTA, la începutul scriptului. Când trece de el, auzi bipul și, de exemplu, „Distors pe master, scade volumul cu 2 dB”. Dacă o pistă e ea însăși peste 0 dB, îți spune și pista: „Pe pista 2 cu 3 dB”.
+Numărul de dB e cât trebuie să scazi ca vârful să coboare la 0 dB, rotunjit în sus. Dacă distorsul continuă, mesajul se repetă cel mult o dată la o secundă și jumătate.
+O pistă peste 0 dB, cu masterul sub 0 dB, nu se aude distorsionată, așa că nu primești alarmă pentru ea.
+
+Poți urca
+
+Cât merge redarea, la fiecare 5 secunde, de cel mult 3 ori, îți spune de exemplu „Poți urca pista 1 cu 4 dB. Poți urca pista 2 cu 1 dB”. Cifra e cât poate urca pista până ajunge ea la 0 dB, dar nici mai mult decât mai are loc masterul. Se socotește după cel mai tare loc de la pornirea redării, deci părțile încete nu te păcălesc. Dacă nicio pistă nu mai are loc, dar masterul are, îți spune „Poți urca masterul cu X dB”. Pentru acest mesaj se aude alt bip.
+Setările sunt la începutul fișierului Distors REAPER.lua: ANUNTA_INCET (true pornit, false oprit), FEREASTRA (5 secunde) și DE_CATE_ORI (3).
+
+Bine de știut
+
+O pistă armată pentru înregistrare arată pe contor ce intră pe la placa de sunet (de exemplu microfonul), nu ce se cântă de pe ea. De aceea, cât timp doar asculți, scriptul nu se uită la pistele armate; le măsoară doar când înregistrezi.
+Dacă folosești și Peak Watcher din OSARA, poți să-l lași oprit, ca să nu primești anunțurile de două ori.
+Pentru verificări, în script există JURNAL: pus pe true, scrie în jurnal.txt, lângă script, ce valori dă REAPER în primele 30 de secunde de redare.
