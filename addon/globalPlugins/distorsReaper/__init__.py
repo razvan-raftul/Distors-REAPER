@@ -5,17 +5,22 @@
 import os
 import re
 import threading
+import time
 
+import api
 import globalPluginHandler
 import queueHandler
 import tones
 import ui
+import wx
+from scriptHandler import script
 from logHandler import log
 
 from . import actualizare
 
 SCRIPT_LUA = os.path.join(os.path.dirname(__file__), "Distors REAPER.lua")
 FISIER = os.path.join(os.environ.get("TEMP", ""), "reaper_distors.txt")
+COMANDA = os.path.join(os.environ.get("TEMP", ""), "reaper_distors_comanda.txt")
 
 
 def citeste():
@@ -94,6 +99,30 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		if mesaj.startswith("Distors"):
 			tones.beep(1200, 80)
 		ui.message(mesaj)
+
+	@script(
+		description="Pornește sau oprește detectorul de distors din REAPER",
+		gesture="kb:control+shift+alt+d",
+	)
+	def script_comuta(self, gesture):
+		try:
+			app = api.getForegroundObject().appModule.appName.lower()
+		except Exception:
+			app = ""
+		if app != "reaper":
+			gesture.send()          # în alte programe tasta rămâne a lor
+			return
+		inainte = self._ultimul
+		try:
+			with open(COMANDA, "w", encoding="utf-8") as f:
+				f.write("%.3f" % time.time())
+		except OSError as e:
+			log.error("Distors REAPER: comanda: %s" % e)
+			return
+		def verifica():
+			if self._ultimul == inainte:
+				ui.message("Detectorul de distors nu rulează. Repornește REAPER.")
+		wx.CallLater(1500, verifica)
 
 	def terminate(self):
 		self._opreste.set()

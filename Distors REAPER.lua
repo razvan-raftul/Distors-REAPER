@@ -5,7 +5,7 @@
 -- Cât merge redarea, spune de cel mult 3 ori „Poți urca pista 1 cu 4 dB. Poți urca pista 2 cu 1 dB”
 -- (alt bip): cât poate urca fiecare pistă fără să treacă ea sau masterul de 0 dB, după cel mai tare
 -- loc de la pornirea redării. Setările sunt mai jos.
--- Aceeași scurtătură îl pornește și îl oprește.
+-- Pornește singur odată cu REAPER. Control Shift Alt D (prins de addonul NVDA) îl oprește și îl pornește.
 
 local FISIER = (os.getenv("TEMP") or "C:\\Windows\\Temp") .. "\\reaper_distors.txt"
 local PAUZA = 1.5          -- secunde minime între două anunțuri de distors
@@ -20,6 +20,19 @@ local DE_CATE_ORI = 3      -- de câte ori îți spune, cel mult, de fiecare dat
 -- ===== Jurnal pentru verificare =====
 local JURNAL = false       -- scrie în jurnal.txt (lângă script) ce valori dă REAPER, în primele 30 de secunde de redare
 -- ======================================
+
+-- Control Shift Alt D în REAPER: addonul NVDA scrie în acest fișier, iar scriptul se oprește sau pornește
+local FIS_COMANDA = (os.getenv("TEMP") or "C:\\Windows\\Temp") .. "\\reaper_distors_comanda.txt"
+local function citeste_comanda()
+  local f = io.open(FIS_COMANDA, "r")
+  if not f then return nil end
+  local t = f:read("a")
+  f:close()
+  return t
+end
+local ultima_comanda = citeste_comanda()   -- ce era dinainte nu contează
+local ultima_verificare = 0
+local activ = true
 
 local CALE_SCRIPT = ({reaper.get_action_context()})[2]
 local FOLDER = CALE_SCRIPT:match("^(.*)[\\/]") or (os.getenv("TEMP") or ".")
@@ -93,6 +106,20 @@ end
 
 bucla_interna = function()
   local acum = reaper.time_precise()
+  if acum - ultima_verificare >= 0.1 then
+    ultima_verificare = acum
+    local c = citeste_comanda()
+    if c and c ~= ultima_comanda then
+      ultima_comanda = c
+      activ = not activ
+      cel_mai_mare = nil
+      piste_peste = {}
+      inceput_redare = nil
+      if reaper.set_action_options then reaper.set_action_options(activ and 4 or 8) end
+      scrie(activ and "Detectorul de distors a pornit" or "Detectorul de distors s-a oprit")
+    end
+  end
+  if not activ then return end
   local reda = (reaper.GetPlayState() & 5) ~= 0
   if reda and not inceput_redare then
     inceput_redare = acum
