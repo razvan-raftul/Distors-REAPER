@@ -32,3 +32,10 @@ Bine de știut
 O pistă armată pentru înregistrare arată pe contor ce intră pe la placa de sunet (de exemplu microfonul), nu ce se cântă de pe ea. De aceea, cât timp doar asculți, scriptul nu se uită la pistele armate; le măsoară doar când înregistrezi.
 Dacă folosești și Peak Watcher din OSARA, poți să-l lași oprit, ca să nu primești anunțurile de două ori.
 Pentru verificări, în script există JURNAL: pus pe true, scrie în jurnal.txt, lângă script, ce valori dă REAPER în primele 30 de secunde de redare.
+
+
+## Actualizare automată (24 nov. 2026, cerut de Răzvan)
+- Depozitul public github.com/razvan-raftul/Distors-REAPER (codul în addon/, workflow în .github/workflows/build.yml). Fiecare push pe main face addonul, cu versiunea 1.1.<numărul build-ului>, și îl pune în release-ul „latest” cu version.txt.
+- actualizare.py: la 20 de secunde după pornirea NVDA citește version.txt; dacă e mai nouă, descarcă și instalează. NVDA spune doar procentul din 10 în 10, cu bipurile de progres, apoi repornește.
+- Codul de lucru e în depozit; modificările se urcă cu git push din sesiune.
+- Addonul pune singur scriptul Distors REAPER.lua peste cel din REAPER (calea din __startup.lua; dacă nu există, în %APPDATA%\REAPER\Scripts și îl adaugă la pornire). REAPER ia scriptul nou după repornire sau după scurtătura apăsată de două ori.
